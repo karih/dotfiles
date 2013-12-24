@@ -1,0 +1,1 @@
+parallelize -p 8 'ufraw-batch --auto-crop --lensfun=auto --wb=camera --out-type=jpeg --out-type=png --out-depth=16 --output=- $i | convert -unsharp 50x50+0.2+0 -resize 800x800 -unsharp 0.5x1 -quality 90 png:- jpg:out/${i%.*}.jpg' *.NEF

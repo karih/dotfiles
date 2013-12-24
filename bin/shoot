@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Based on a version by Sirupsen @ http://sirupsen.dk
+# Depends on scrot, scp, xclip
+
+. ${HOME}/etc/shoot
+
+NAME="$(tr -dc "[:alpha:]" < /dev/urandom | head -c 8).png"
+scrot -s $NAME
+scp $NAME "${SCPPATH}${NAME}"
+echo -n "${HTTPURL}${NAME}" | xclip -selection c
+rm $NAME 

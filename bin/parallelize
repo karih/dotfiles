@@ -1,0 +1,40 @@
+#!/usr/bin/python
+
+import argparse
+import threading 
+import subprocess
+import queue
+
+# ufraw-batch --auto-crop --lensfun=auto --wb=camera --out-type=jpeg --out-type=png --out-depth=16 --output=- DSC_7686.NEF | convert -unsharp 40x40+0.2+0 -resize 998x998 -unsharp 0.5x1.5 -quality 99 png:- jpg:out-test.jpg
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--processes', '-p', type=int, metavar='N', default=1)
+    parser.add_argument('command', nargs=1)
+    parser.add_argument('arguments', nargs="+")
+
+    args = parser.parse_args()
+
+    q = queue.Queue()
+    for i in args.arguments:
+        q.put(i)
+
+    def call(arg):
+        print(subprocess.check_output(" ".join(args.command), shell=True, env={'i':arg}, executable='/usr/bin/bash').decode('utf-8').strip())
+    
+    def worker():
+        try:
+            while True:
+                arg = q.get()
+                call(arg)
+                q.task_done()
+        except queue.Empty as e:
+            return
+     
+    for i in range(args.processes):
+        t = threading.Thread(target=worker)
+        t.daemon = True
+        t.start()
+
+    q.join()
+

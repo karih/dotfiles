@@ -1,0 +1,1 @@
+for i in $(ls *NEF); do if [ ! -f ${i%.*}.jpg ]; then rm $i; fi; done

@@ -1,0 +1,12 @@
+#!/bin/bash
+# Depends on inotifywait, xelatex, bibtex
+# Run in directory of base tex file, example:
+# $ watch-tex thesis.tex
+
+ARGS="-halt-on-error"
+FNOEXT=${1%.*}
+while true; do
+	change=$(inotifywait -e close_write,moved_to,create .);
+	rm ${FNOEXT}.aux
+	xelatex $ARGS ${FNOEXT}.tex && bibtex ${FNOEXT}.aux && xelatex $ARGS ${FNOEXT}.tex && xelatex $ARGS ${FNOEXT}.tex
+done
